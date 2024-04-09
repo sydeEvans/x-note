@@ -1,0 +1,17 @@
+.app{
+    height: 100vh;
+}
+
+.prose{
+    padding: 20px 40px;
+    font-family: "Menlo", sans-serif;
+}
+
+.left{
+    min-width: 280px;
+    padding-top: 38px;
+}
+
+.right{
+    flex: 1;
+}
