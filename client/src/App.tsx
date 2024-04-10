@@ -33,6 +33,7 @@ import {useEffect, useRef} from "react";
 import {client} from "./service/alist-client.ts";
 import {Button} from "@nextui-org/react";
 import {updateQueryParameter} from "./UpdateQueryParameter.tsx";
+import axios from "axios";
 
 function App() {
   const ref = useRef<MDXEditorMethods>(null);
@@ -54,7 +55,7 @@ function App() {
 
     const getResp = await client.post('/api/fs/get', {"path": state.selectFile});
     const rawUrl = getResp.data.data.raw_url;
-    const resp = await client.get(rawUrl);
+    const resp = await client.get(new URL(rawUrl).pathname);
     setState({
       fileContent:
         typeof resp.data === "string" ? resp.data : resp.data.message,
