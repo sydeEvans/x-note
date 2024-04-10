@@ -1,10 +1,5 @@
 .app{
-    height: 100vh;
-}
-
-.prose{
-    padding: 20px 40px;
-    font-family: "Menlo", sans-serif;
+    min-height: 100vh;
 }
 
 .left{
@@ -14,4 +9,22 @@
 
 .right{
     flex: 1;
+    height: 100vh;
+    overflow-y: scroll;
+    padding-top: 43px;
+}
+
+.right-title{
+    width: 100%;
+    z-index: 2;
+    background: white;
+    top: 0;
+    position: fixed;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+}
+
+.right-title-btn{
+    margin-left: 30px;
 }
