@@ -52,7 +52,9 @@ function App() {
   useAsync(async () => {
     if (!state.selectFile) return;
 
-    const resp = await client.get(`/p${state.selectFile}?t=${Date.now()}`);
+    const getResp = await client.post('/api/fs/get', {"path": state.selectFile});
+    const rawUrl = getResp.data.data.raw_url;
+    const resp = await client.get(rawUrl);
     setState({
       fileContent:
         typeof resp.data === "string" ? resp.data : resp.data.message,

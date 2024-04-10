@@ -71,10 +71,9 @@ export const AlistFileTree = (props: IAlistFileTreeProps) => {
             },
         } as Record<string, TreeItem>;
 
-        const basePath = '/note-app';
+        const basePath = '';
 
         const newFileItems = await mountFileList(fileItems, basePath, 'root');
-
 
         setState({
             fileItems: newFileItems,
