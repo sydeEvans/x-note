@@ -33,7 +33,6 @@ import {useEffect, useRef} from "react";
 import {client} from "./service/alist-client.ts";
 import {Button} from "@nextui-org/react";
 import {updateQueryParameter} from "./UpdateQueryParameter.tsx";
-import axios from "axios";
 
 function App() {
   const ref = useRef<MDXEditorMethods>(null);
