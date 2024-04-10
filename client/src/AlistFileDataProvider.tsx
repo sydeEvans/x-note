@@ -6,6 +6,8 @@ import {
 } from "react-complex-tree";
 import {useMount, useSetState} from "react-use";
 import {client} from "./service/alist-client.ts";
+import {Button} from "@nextui-org/react";
+import filesvg from "./assets/addFile.svg";
 
 
 
@@ -79,49 +81,115 @@ export const AlistFileTree = (props: IAlistFileTreeProps) => {
             fileItems: newFileItems,
         });
     });
-
     return (
-        <ControlledTreeEnvironment
-            items={state.fileItems}
-            getItemTitle={item => item.data}
-            onFocusItem={async (item) => {
-                setState({focusedItem: item.index});
-                if (!item.isFolder) {
-                    props.onSelectFile(item.index as string);
-                }
-            }}
-            onExpandItem={async (item) => {
-                if (item.isFolder) {
-                    if (!item.children) {
-                        const newFileItems = await mountFileList(state.fileItems, item.index as string, item.index as string);
-                        setState({
-                            fileItems: newFileItems,
-                        });
-                    }
+        <>
+            <div className="left-tool">
+                <Button isIconOnly size="sm" className="left-tool-btn"
+                        onClick={async () => {
+                            const fileName =  new Date().getTime() + '.md';
+                            const filePath = '/' + fileName;
+                            await client.put("/api/fs/put", '新的文件', {
+                                headers: {
+                                    "File-Path": filePath,
+                                    "Content-Type": "application/octet-stream",
+                                },
+                            });
 
-                    setState({
-                        expandedItems: [...state.expandedItems, item.index],
+                            const newFileItems = {...state.fileItems};
+                            newFileItems['root'].children?.push(filePath);
+                            newFileItems[filePath] = {
+                                index: filePath,
+                                canMove: true,
+                                isFolder: false,
+                                data: fileName,
+                                canRename: true
+                            }
+
+                            setState({
+                                fileItems: newFileItems,
+                            });
+                        }}
+                >
+                    <img src={filesvg} alt=""/>
+                </Button>
+            </div>
+
+            <ControlledTreeEnvironment
+                items={state.fileItems}
+                getItemTitle={item => item.data}
+                onRenameItem={async (item, newName) => {
+
+                    const resp = await client.post('/api/fs/rename', {
+                        "name": newName,
+                        "path": item.index
                     });
 
-                }
-            }}
-            onCollapseItem={item => {
-                setState({
-                    expandedItems: state.expandedItems.filter(it => it !== item.index),
-                });
-            }}
-            onSelectItems={items => {
-                setState({selectedItems: items});
-            }}
-            viewState={{
-                ['tree-1']: {
-                    focusedItem: state.focusedItem,
-                    expandedItems: state.expandedItems,
-                    selectedItems: state.selectedItems,
-                }
-            }}
-        >
-            <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example"/>
-        </ControlledTreeEnvironment>
+                    if (resp.status === 200 && resp.data.code === 200) {
+                        const newItems = {...state.fileItems};
+                        const oldItem = newItems[item.index];
+                        delete newItems[item.index];
+
+                        Object.keys(newItems).forEach(key => {
+                            const it = newItems[key];
+                            if (it.children) {
+                                it.children = it.children.map(child => {
+                                    if (child === item.index) {
+                                        return (item.index as string).replace(item.data, newName);
+                                    }
+                                    return child;
+                                });
+                            }
+                        })
+
+                        oldItem.index = (item.index as string).replace(item.data, newName);
+                        oldItem.data = newName;
+
+                        newItems[oldItem.index] = oldItem;
+
+                        setState({ fileItems: newItems });
+                    }
+
+                }}
+                onFocusItem={async (item) => {
+                    setState({focusedItem: item.index});
+                    if (!item.isFolder) {
+                        props.onSelectFile(item.index as string);
+                    }
+                }}
+                onExpandItem={async (item) => {
+                    if (item.isFolder) {
+                        if (!item.children) {
+                            const newFileItems = await mountFileList(state.fileItems, item.index as string, item.index as string);
+                            setState({
+                                fileItems: newFileItems,
+                            });
+                        }
+
+                        setState({
+                            expandedItems: [...state.expandedItems, item.index],
+                        });
+
+                    }
+                }}
+                onCollapseItem={item => {
+                    setState({
+                        expandedItems: state.expandedItems.filter(it => it !== item.index),
+                    });
+                }}
+                onSelectItems={items => {
+                    setState({selectedItems: items});
+                }}
+                viewState={{
+                    ['tree-1']: {
+                        focusedItem: state.focusedItem,
+                        expandedItems: state.expandedItems,
+                        selectedItems: state.selectedItems,
+                    }
+                }}
+            >
+                <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example"/>
+            </ControlledTreeEnvironment>
+        </>
+
     )
 }

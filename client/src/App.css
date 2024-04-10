@@ -4,8 +4,17 @@
 
 .left{
     min-width: 280px;
-    padding-top: 38px;
+    padding-top: 20px;
 }
+
+.left-tool{
+    display: flex;
+}
+.left-tool-btn{
+    margin-left: auto;
+    margin-right: 10px;
+}
+
 @media (max-width: 680px){
     .left{
         display: none;

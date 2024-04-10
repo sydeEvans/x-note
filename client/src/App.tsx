@@ -33,6 +33,7 @@ import {useEffect, useRef} from "react";
 import {client} from "./service/alist-client.ts";
 import {Button} from "@nextui-org/react";
 import {updateQueryParameter} from "./UpdateQueryParameter.tsx";
+import filesvg from "./assets/addFile.svg";
 
 function App() {
   const ref = useRef<MDXEditorMethods>(null);
@@ -52,14 +53,20 @@ function App() {
   useAsync(async () => {
     if (!state.selectFile) return;
 
-    const getResp = await client.post('/api/fs/get', {"path": state.selectFile});
-    const rawUrl = getResp.data.data.raw_url;
-    const resp = await client.get(new URL(rawUrl).pathname);
-    setState({
-      fileContent:
-        typeof resp.data === "string" ? resp.data : resp.data.message,
-    });
-
+    try {
+      const getResp = await client.post('/api/fs/get', {"path": state.selectFile});
+      const rawUrl = getResp.data.data.raw_url;
+      const resp = await client.get(new URL(rawUrl).pathname);
+      setState({
+        fileContent:
+            typeof resp.data === "string" ? resp.data : resp.data.message,
+      });
+    } catch (e:any) {
+        console.error(e);
+        setState({
+          fileContent: e.message,
+        })
+    }
 
     updateQueryParameter('path', state.selectFile);
   }, [state.selectFile]);
