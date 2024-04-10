@@ -12,25 +12,27 @@ import {
   linkPlugin,
   listsPlugin,
   markdownShortcutPlugin,
+  MDXEditor,
   MDXEditorMethods,
   quotePlugin,
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
+  toolbarPlugin,
 } from "@mdxeditor/editor";
-import { MDXEditor, toolbarPlugin } from "@mdxeditor/editor";
 import "react-complex-tree/lib/style-modern.css";
 import Split from "@uiw/react-split";
 
 import "@mdxeditor/editor/style.css";
 import "./App.css";
 import "./editor.css";
-import { virtuosoSampleSandpackConfig } from "./virtuosoSampleSandpackConfig.ts";
-import { AlistFileTree } from "./AlistFileDataProvider.tsx";
-import { useAsync, useSetState } from "react-use";
-import { useEffect, useRef } from "react";
-import { client } from "./service/alist-client.ts";
-import { Button } from "@nextui-org/react";
+import {virtuosoSampleSandpackConfig} from "./virtuosoSampleSandpackConfig.ts";
+import {AlistFileTree} from "./AlistFileDataProvider.tsx";
+import {useAsync, useMount, useSetState} from "react-use";
+import {useEffect, useRef} from "react";
+import {client} from "./service/alist-client.ts";
+import {Button} from "@nextui-org/react";
+import {updateQueryParameter} from "./UpdateQueryParameter.tsx";
 
 function App() {
   const ref = useRef<MDXEditorMethods>(null);
@@ -40,15 +42,24 @@ function App() {
     saveTip: "",
   });
 
+  useMount(() => {
+    const path = new URLSearchParams(location.search).get('path');
+    setState({
+      selectFile: path || ''
+    })
+  });
+
   useAsync(async () => {
     if (!state.selectFile) return;
 
     const resp = await client.get(`/p${state.selectFile}?t=${Date.now()}`);
-    console.log(resp);
     setState({
       fileContent:
         typeof resp.data === "string" ? resp.data : resp.data.message,
     });
+
+
+    updateQueryParameter('path', state.selectFile);
   }, [state.selectFile]);
 
   useEffect(() => {

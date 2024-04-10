@@ -190,8 +190,8 @@ img, video {
     padding: 20px 40px;
 }
 .prose :where(p):not(:where([class~=not-prose] *)) {
-    margin-top: 1.25em;
-    margin-bottom: 1.25em
+    margin-top: 0.25em;
+    margin-bottom: 0.5em
 }
 
 .prose :where([class~=lead]):not(:where([class~=not-prose] *)) {
@@ -316,7 +316,7 @@ img, video {
     font-weight: 800;
     font-size: 2.25em;
     margin-top: 0;
-    margin-bottom: .8888889em;
+    margin-bottom: 0.5em;
     line-height: 1.1111111
 }
 
@@ -329,8 +329,8 @@ img, video {
     color: var(--tw-prose-headings);
     font-weight: 700;
     font-size: 1.5em;
-    margin-top: 2em;
-    margin-bottom: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
     line-height: 1.3333333
 }
 
